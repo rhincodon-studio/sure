@@ -10,8 +10,10 @@ class Provider::YahooFinance < Provider
   InvalidSymbolError = Class.new(Error)
   MarketClosedError = Class.new(Error)
 
-  # Cache duration for repeated requests (5 minutes)
-  CACHE_DURATION = 5.minutes
+  # Cache duration for repeated requests (default: 30 minutes, configurable via ENV)
+  # Higher values reduce API calls but increase data staleness
+  # Set YAHOO_FINANCE_CACHE_DURATION=5 for more frequent updates (original behavior)
+  CACHE_DURATION = ENV.fetch("YAHOO_FINANCE_CACHE_DURATION", 30).to_i.minutes
 
   # Maximum cache duration for cookie/crumb authentication
   # Even if cookie has longer expiry, cap it to avoid stale crumbs
@@ -25,7 +27,8 @@ class Provider::YahooFinance < Provider
   end
 
   # Minimum delay between requests to avoid rate limiting (in seconds)
-  MIN_REQUEST_INTERVAL = 0.5
+  # Default increased from 0.5 to 1.0 to be more conservative with Yahoo's unofficial API
+  MIN_REQUEST_INTERVAL = 1.0
 
   # Pool of modern browser user-agents to rotate through
   # Based on https://github.com/ranaroussi/yfinance/pull/2277
