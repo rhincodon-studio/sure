@@ -1,0 +1,43 @@
+# ============================================================================
+# Fork Build Workflow
+# ============================================================================
+#
+# Build and push Docker image for rhincodon-studio/sure fork
+# Uses the shared kaniko build template
+#
+# ============================================================================
+
+name: Build Fork Image
+
+on:
+  push:
+    branches: [main, feat/yahoo-finance-rate-limit-config]
+    paths-ignore:
+      - 'charts/**'
+      - 'mobile/**'
+      - '*.md'
+      - 'docs/**'
+
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to build'
+        required: false
+        type: string
+        default: 'main'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    uses: rhincodon-studio/public-devops-templates/.github/workflows/build-kaniko-tpl.yml@v1.3.30
+    with:
+      repository: rhincodon-studio/sure
+      container_repository: rhincodon-studio/sure
+      working_directory: "."
+      dockerfile_path: "Dockerfile"
+      registry: "ghcr"
+      runs_on: '["arc-runner-set"]'
+    secrets: inherit
