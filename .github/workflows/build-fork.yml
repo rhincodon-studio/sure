@@ -32,7 +32,6 @@ permissions:
 
 jobs:
   build:
-    timeout-minutes: 5
     uses: rhincodon-studio/public-devops-templates/.github/workflows/build-kaniko-tpl.yml@v1.3.30
     with:
       repository: rhincodon-studio/sure
