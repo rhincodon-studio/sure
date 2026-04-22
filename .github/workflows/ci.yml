@@ -1,3 +1,9 @@
+# ============================================================================
+# CI Workflow (Fork)
+# ============================================================================
+# Migrated from upstream to use self-hosted runner (arc-runner-set)
+# ============================================================================
+
 name: CI
 
 on:
@@ -5,8 +11,8 @@ on:
 
 jobs:
   scan_ruby:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: arc-runner-set
+    timeout-minutes: 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,8 +27,8 @@ jobs:
         run: bin/brakeman --no-pager
 
   scan_js:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: arc-runner-set
+    timeout-minutes: 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -37,8 +43,8 @@ jobs:
         run: bin/importmap audit
 
   lint:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: arc-runner-set
+    timeout-minutes: 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -53,8 +59,8 @@ jobs:
         run: bin/rubocop -f github
 
   lint_js:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: arc-runner-set
+    timeout-minutes: 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -73,8 +79,8 @@ jobs:
         run: npm run lint
 
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
+    runs-on: arc-runner-set
+    timeout-minutes: 5
 
     env:
       PLAID_CLIENT_ID: foo
