@@ -1,0 +1,16 @@
+name: Test Subdirectory Path
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    uses: rhincodon-studio/public-devops-templates/.github/workflows/build/kaniko-tpl.yml@fix/kaniko-export-version-mkdir
+    with:
+      repository: rhincodon-studio/sure
+      container_repository: rhincodon-studio/sure-test
+      working_directory: "."
+      dockerfile_path: "Dockerfile"
+      registry: "ghcr"
+      runs_on: '["arc-runner-set"]'
+    secrets: inherit
