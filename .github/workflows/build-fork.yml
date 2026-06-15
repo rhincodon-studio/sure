@@ -11,7 +11,9 @@ name: Build Fork Image
 
 on:
   push:
-    branches: [main, feat/yahoo-finance-rate-limit-config]
+    branches: [main]
+    tags:
+      - v*
     paths-ignore:
       - 'charts/**'
       - 'mobile/**'
