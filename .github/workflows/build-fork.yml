@@ -20,13 +20,10 @@ on:
       - '*.md'
       - 'docs/**'
 
+  # Manual trigger: use the native branch/tag selector in the "Run workflow"
+  # dialog to choose which ref to build. The shared build template checks out
+  # whatever ref triggered the run, so no custom `ref` input is needed.
   workflow_dispatch:
-    inputs:
-      ref:
-        description: 'Git ref to build'
-        required: false
-        type: string
-        default: 'main'
 
 permissions:
   contents: read
