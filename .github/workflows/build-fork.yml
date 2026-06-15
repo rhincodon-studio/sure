@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   build:
-    uses: rhincodon-studio/public-devops-templates/.github/workflows/build-kaniko-tpl.yml@v1.4.1
+    uses: rhincodon-studio/public-devops-templates/.github/workflows/build-kaniko-tpl.yml@v1.5.4
     with:
       repository: rhincodon-studio/sure
       container_repository: rhincodon-studio/sure
