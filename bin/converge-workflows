@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+#
+# bin/converge-workflows
+#
+# Keep this fork's CI isolated from upstream (we-promise/sure).
+#
+# We intentionally ship only our own GitHub Actions workflow(s) and drop all of
+# upstream's. After merging/pulling upstream changes, upstream's workflow files
+# can reappear (or cause modify/delete conflicts when upstream edits a file we
+# already deleted). Run this script to reconverge .github/workflows/ back to our
+# own set.
+#
+# Usage:
+#   git merge upstream/<branch>     # may stop on conflicts
+#   bin/converge-workflows          # drop upstream workflows, stage removals
+#   git commit                      # folds the removals into the merge commit
+#
+# Safe to run anytime; idempotent. Works mid-merge: `git rm` also resolves the
+# modify/delete conflicts that arise when upstream edits a workflow we removed.
+
+set -euo pipefail
+
+# Workflows owned by this fork. Everything else under .github/workflows/ is
+# removed. Add filenames here when you introduce more of your own workflows.
+KEEP=(
+  "build-fork.yml"
+)
+
+WF_DIR=".github/workflows"
+
+cd "$(git rev-parse --show-toplevel)"
+
+if [ ! -d "$WF_DIR" ]; then
+  echo "No $WF_DIR directory; nothing to converge."
+  exit 0
+fi
+
+is_kept() {
+  local name="$1" k
+  for k in "${KEEP[@]}"; do
+    [ "$name" = "$k" ] && return 0
+  done
+  return 1
+}
+
+removed=0
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  name="$(basename "$path")"
+  is_kept "$name" && continue
+
+  # `git rm -f` removes from index + working tree and resolves modify/delete
+  # conflicts; fall back to plain rm for untracked files not in the index.
+  if ! git rm -f --quiet "$path" 2>/dev/null; then
+    rm -f "$path"
+  fi
+  echo "removed: $path"
+  removed=$((removed + 1))
+done < <(find "$WF_DIR" -maxdepth 1 -type f \( -name '*.yml' -o -name '*.yaml' \) | sort)
+
+# Sanity check: our own workflows must still be present afterwards.
+missing=0
+for k in "${KEEP[@]}"; do
+  if [ ! -f "$WF_DIR/$k" ]; then
+    echo "WARNING: expected to keep $WF_DIR/$k but it is missing." >&2
+    missing=1
+  fi
+done
+
+if [ "$removed" -eq 0 ]; then
+  echo "Workflows already converged (only fork-owned files present)."
+else
+  echo "Converged: removed $removed upstream workflow file(s); staged for commit."
+fi
+
+[ "$missing" -eq 0 ]
